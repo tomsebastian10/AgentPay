@@ -41,6 +41,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     triggerPriceSurgeDemoBtn.addEventListener('click', runPriceSurgeDemo);
   }
 
+  // Setup forged signature simulation trigger
+  const triggerForgedSigDemoBtn = document.getElementById('triggerForgedSigDemoBtn');
+  if (triggerForgedSigDemoBtn) {
+    triggerForgedSigDemoBtn.addEventListener('click', runForgedSigDemo);
+  }
+
   // Refresh logs button
   refreshLogsBtn.addEventListener('click', fetchAuditLogs);
 
@@ -355,6 +361,59 @@ async function runPriceSurgeDemo() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ productId: currentProposal.productId })
     });
+  }, 1000);
+}
+
+// 8b. Forged Signature Failure Scenario Demo
+async function runForgedSigDemo() {
+  userInput.value = 'Find me a wireless mechanical keyboard under ₹8,000';
+  appendChatMessage('⚡ <em>DEMO: Initiating Forged Payment Signature Attack Simulation...</em>', 'system');
+  
+  // Submit chat
+  await chatForm.dispatchEvent(new Event('submit'));
+
+  setTimeout(async () => {
+    if (!currentProposal) return;
+    
+    // Issue Spend Token
+    const authRes = await fetch('/api/agent/authorize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        intentId: currentProposal.intentId,
+        productId: currentProposal.productId,
+        merchantId: currentProposal.merchantId,
+        priceINR: currentProposal.priceINR,
+        pricePaise: currentProposal.pricePaise,
+        maxBudgetINR: currentProposal.userBudgetINR
+      })
+    });
+    const authData = await authRes.json();
+    
+    // Execute purchase
+    const execRes = await fetch('/api/agent/execute-purchase', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        spendToken: authData.spendToken,
+        productId: currentProposal.productId,
+        merchantId: currentProposal.merchantId,
+        amountPaise: currentProposal.pricePaise
+      })
+    });
+    const execData = await execRes.json();
+    
+    if (execData.success) {
+      appendChatMessage(`Order <code>${execData.orderId}</code> created. Submitting FORGED signature payload to payment verification gateway...`, 'system');
+      
+      const forgedSignature = 'forged_fake_signature_hash_00000000000000000000000000000000';
+      await verifyAndFinalizePayment({
+        orderId: execData.orderId,
+        paymentId: 'pay_unauthorized_attacker',
+        signature: forgedSignature,
+        intentId: currentProposal.intentId
+      });
+    }
   }, 1000);
 }
 

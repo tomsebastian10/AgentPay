@@ -59,7 +59,26 @@ This guide provides a structured walkthrough for demonstrating **AgentPay** duri
 
 ---
 
-### Demo 4: 10-Scenario Synthetic Benchmark Suite
+### Demo 4: Cryptographic Payment Signature Tampering Defense
+*Demonstrates defense against forged payment callbacks or altered transaction payloads.*
+1. Click the preset chip: **`❌ Test Forged Signature`**.
+2. The agent generates the order, but submits a fake signature hash (`forged_fake_signature_hash_...`) to the gateway verification endpoint.
+3. **Result:**
+   - The backend `PaymentVerifier` executes constant-time HMAC-SHA256 verification, rejects the signature, and flags `PAYMENT_UNVERIFIED_FRAUD`.
+   - The UI immediately reports `❌ Payment Verification Failed: Cryptographic HMAC-SHA256 signature mismatch.` and prevents order fulfillment.
+
+---
+
+### Demo 5: Human-in-the-Loop Rejection / Abort
+*Demonstrates that without explicit human authorization, zero transactions occur.*
+1. Submit a shopping query (e.g., *"Find me a wireless mechanical keyboard under ₹8,000"*).
+2. Review the AI's proposal, then click **`Reject / Abort`**.
+3. **Result:**
+   - The proposal is discarded, no spend authorization token is signed, no Razorpay order is created, and the audit trail records the user abort.
+
+---
+
+### Demo 6: 10-Scenario Synthetic Benchmark Suite
 1. Click the **"Run Benchmark Suite"** button in the top navigation bar.
 2. An interactive modal pops up executing 10 automated test scenarios:
    - Standard Purchase
