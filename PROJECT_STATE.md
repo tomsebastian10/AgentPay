@@ -1,20 +1,24 @@
 # Project State
 
 ## Current Phase
-STAGE 0 — Challenge Research (Completed) -> Moving to STAGE 1 (Technical Research)
+STAGE 1 — Technical Research (Completed) -> Moving to STAGE 2 & 3 (Design & Architecture)
 
 ## Completed
 - Initialized Git repository foundation in `scratch/AgentPay/`
 - Configured `.gitignore` for security and clean environment management
-- Completed STAGE 0 Challenge Analysis in `docs/challenge-analysis.md` outlining the 13-step Agentic Commerce workflow, security invariants, and Razorpay Test Mode integration boundaries.
+- Completed STAGE 0 Challenge Analysis in `docs/challenge-analysis.md` outlining the 13-step Agentic Commerce workflow.
+- Completed STAGE 1 Technical Research in `docs/technical-research.md` documenting Razorpay Test Mode API schemas (Orders, Checkout, Payments, HMAC SHA-256 verification, Webhooks) and Agentic Commerce protocols (MCP, AP2/ACP tokenization, x402).
 
 ## Current Task
-STAGE 0 completed. Ready for STAGE 1 — Technical Research (`docs/technical-research.md`).
+STAGE 2 & 3 — System Design & Technical Architecture (`docs/architecture.md`).
 
 ## Next Tasks
-1. STAGE 1 — Technical Research: Research Razorpay Test Mode APIs (Orders, Checkout, Payments, HMAC verification, Webhooks) and agentic commerce standards (MCP, AP2, etc.) in `docs/technical-research.md`.
-2. STAGE 2 & 3 — Project Design & Architecture: Define system architecture, data models, and API interfaces.
-3. STAGE 4 — Repository Foundation & Setup.
+1. STAGE 2 & 3: Define complete system architecture, data models, and API interfaces in `docs/architecture.md`.
+2. STAGE 4: Build repository foundation (FastAPI / Node.js backend setup, SQLite DB, dependency manifests).
+3. STAGE 5: Implement AI Buyer Reasoning Engine (Intent Extraction, Constraint Parsing, Comparison, Prompt Injection Guard).
+4. STAGE 6: Implement Merchant Interface & Catalog Engine (x402 quotes, standard product models).
+5. STAGE 7: Product Discovery & Evaluation Engine.
+6. STAGE 8 & 9: Deterministic Policy Engine & Razorpay Test Mode Payment Layer.
 
 ## Known Issues
 None.
