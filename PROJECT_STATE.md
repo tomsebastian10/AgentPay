@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Phase
-STAGE 22 — Lightweight Intent Classification (Conversational, Ambiguous, Commerce) & AI Honesty Engine (Completed)
+STAGE 24 — Product Imagery & Multi-Attribute Catalog Filtering / Sorting (Completed)
 
 ## Completed
 - **STAGE 0 — Challenge Research:** Documented official track requirements in `docs/challenge-analysis.md`.
@@ -27,20 +27,27 @@ STAGE 22 — Lightweight Intent Classification (Conversational, Ambiguous, Comme
   2. Untrusted merchant product description prompt injection defense.
   3. Expanded catalog to 29 items across 6 verified merchants.
 - **STAGE 21 — Real Gemini LLM Natural Language Intent Engine Integration:**
-  1. Google Gemini Free Tier (`gemini-1.5-flash`) via `GeminiIntentExtractor` using native fetch and strict JSON mode (`responseMimeType: "application/json"`).
+  1. Google Gemini Free Tier (`gemini-3.6-flash`) via `GeminiIntentExtractor` using native fetch and strict JSON mode (`responseMimeType: "application/json"`).
   2. Strict Zod schema validation (`IntentConstraintSchema`) and null-budget preservation.
 - **STAGE 22 — Lightweight Intent Classification & AI Honesty Engine:**
-  1. **Conversational Intent Branching:** Casual greetings ("hi", "hello", "hey", "what can you do?", "help", "thanks") return a friendly guidance response without triggering unnecessary product discovery or hallucinated recommendations.
-  2. **Ambiguous Intent Clarification:** Vague queries without identifiable product categories ("I need something good for work", "suggest something for college") prompt the user for category clarification instead of blindly picking a random product.
-  3. **Commerce Intent Flow:** Explicit product queries ("find me a wireless keyboard", "headphones for travel") continue through discovery, multi-criteria scoring, and bounded proposal formulation.
-  4. **AI Honesty in UI:** Clear visual distinction between `✨ AI Intent Extraction — Gemini` (when Gemini API key is configured and active) and `⚡ Offline Intent Engine` (when running offline or in deterministic fallback mode). Never mislabels deterministic parsing as Gemini.
+  1. Conversational intent branching (greetings/help return guidance without triggering product discovery).
+  2. Ambiguous intent clarification (vague queries prompt for category without blind selection).
+  3. Commerce intent flow with structured intent chips (`🏷️ Category`, `💰 Budget`, `✨ Features`).
+  4. AI honesty in UI (`✨ AI Intent Extraction — Gemini` vs `⚡ Offline Intent Engine`).
+- **STAGE 23 — Final Implementation Audit & Submission Readiness Review:**
+  1. Verified all 8 core priorities.
+  2. Verified test pass rates (27 unit tests, 10 benchmarks, 7 E2E checks).
+- **STAGE 24 — Product Imagery & Multi-Attribute Catalog Filtering / Sorting:**
+  1. **Category-Specific Vector Imagery:** Created and mapped clean, responsive vector illustrations for all 29 products (Keyboards, ANC Headphones, Displays/Monitors, Ergonomic Mice, Developer Laptops, and Webcams) with automatic fallback `onerror="this.src='/images/products/fallback-product.svg'"`.
+  2. **Multi-Attribute Filter & Sort Controls:** Added glassmorphic toolbar allowing users to refine displayed products by Category, Price Range, Minimum Rating, Merchant Whitelist, and In-Stock Status.
+  3. **Seamless Discovery Synergy:** Sorting preserves AI candidate match rankings as the default (`Recommended (AI Match)`), allowing seamless manual refinement without breaking AI proposal logic.
 
 ## Current Task
-Intent classification and AI honesty engine verified across all test suites. All 27 unit tests, 10 synthetic benchmarks, and 7 live E2E server checks passing at 100%.
+Final features complete. All 27 unit tests, 10 synthetic benchmarks, and 7 live E2E server checks passing at 100%.
 
 ## Next Tasks
-1. Optional: Add real Razorpay test mode API keys in `.env` if desired (offline mock fallback is 100% verified and active).
-2. Pitch demo recording following `docs/demo-guide.md`.
+1. Pitch demo recording following `docs/demo-guide.md`.
+2. Final submission packaging.
 
 ## Architecture Decisions
 - **Dual-Engine Model:** AI Buyer Reasoning Engine (Intent, Discovery, Comparison, Explanation) strictly separated from Deterministic Policy Layer (Hard verification of budget, price consistency, merchant validity, user authorization).
@@ -52,21 +59,18 @@ Intent classification and AI honesty engine verified across all test suites. All
 ## Important Files
 - `PROJECT_STATE.md`: Canonical project state.
 - `server/index.js`: Main server entry point.
-- `server/agents/buyer_agent.js`: Intent classification (conversational, ambiguous, commerce), constraint extraction, and multi-criteria scoring.
+- `server/agents/buyer_agent.js`: Intent classification, constraint extraction, and candidate scoring.
 - `server/agents/gemini_extractor.js`: Google Gemini Free Tier intent extractor with JSON schema and Zod validation.
-- `server/agents/prompts.js`: System prompts for intent classification and extraction.
-- `server/agents/sanitizer.js`: Adversarial prompt-injection defense.
+- `server/commerce/catalog.js`: Multi-provider commerce catalog & comparison engine.
+- `server/commerce/merchants.js`: Authorized merchant registry with trust scores.
+- `server/commerce/providers/internal_catalog_provider.js`: Internal catalog provider (29 items with dedicated imagery).
 - `server/policies/policy_engine.js`: Zero-trust deterministic policy validator.
 - `server/policies/spend_token.js`: AP2 cryptographic spend authorization token manager.
-- `server/commerce/catalog.js`: Pluggable multi-provider commerce catalog & comparison engine.
-- `server/commerce/merchants.js`: Authorized merchant registry with trust scores.
-- `server/commerce/providers/base_provider.js`: Base provider abstraction.
-- `server/commerce/providers/internal_catalog_provider.js`: Internal catalog provider implementation (29 products).
 - `server/payments/razorpay_adapter.js`: Official Razorpay client & mock provider.
 - `server/payments/verifier.js`: Constant-time HMAC-SHA256 signature verifier.
 - `server/database/audit_store.js`: Immutable audit trail store.
 - `server/evaluation/run_benchmarks.js`: 10-scenario synthetic benchmark suite runner.
-- `public/index.html`, `public/styles.css`, `public/app.js`: Glassmorphic web application with honest AI source indicators.
+- `public/index.html`, `public/styles.css`, `public/app.js`: Glassmorphic web application with filtering, sorting, and product illustrations.
 - `tests/`: Complete unit and integration test suite (27 tests).
 
 ## Commands

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgCam" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="lensRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" rx="16" fill="url(#bgCam)"/>
+  <!-- Monitor Mount Clip -->
+  <rect x="185" y="170" width="30" height="45" rx="4" fill="#334155"/>
+  <path d="M 160 215 L 240 215 L 230 235 L 170 235 Z" fill="#475569"/>
+  <!-- Webcam Barrel / Body -->
+  <rect x="100" y="100" width="200" height="70" rx="35" fill="#1e293b" stroke="#475569" stroke-width="3"/>
+  <!-- Lens Housing -->
+  <circle cx="200" cy="135" r="30" fill="#0f172a" stroke="url(#lensRing)" stroke-width="4"/>
+  <circle cx="200" cy="135" r="18" fill="#0284c7" opacity="0.6"/>
+  <circle cx="200" cy="135" r="10" fill="#0369a1"/>
+  <circle cx="194" cy="128" r="4" fill="#ffffff" opacity="0.8"/>
+  <!-- Status LED & Stereo Mics -->
+  <circle cx="140" cy="135" r="3" fill="#64748b"/>
+  <circle cx="148" cy="135" r="3" fill="#64748b"/>
+  <circle cx="260" cy="135" r="3" fill="#64748b"/>
+  <circle cx="252" cy="135" r="3" fill="#64748b"/>
+  <circle cx="170" cy="115" r="3" fill="#10b981"/>
+  <text x="200" y="270" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#94a3b8" text-anchor="middle" letter-spacing="1">1080P / 4K PRO WEBCAM</text>
+</svg>

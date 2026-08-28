@@ -180,6 +180,77 @@
           </div>
         </div>
 
+        <!-- Catalog Filtering & Sorting Toolbar -->
+        <div class="catalog-filters-bar">
+          <div class="filter-group">
+            <label class="filter-label" for="filterCategory">Category:</label>
+            <select id="filterCategory" class="filter-select">
+              <option value="all">All Categories</option>
+              <option value="keyboard">Keyboards</option>
+              <option value="headphones">Headphones & Audio</option>
+              <option value="monitor">Monitors</option>
+              <option value="mouse">Mice</option>
+              <option value="laptop">Laptops</option>
+              <option value="webcam">Webcams</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label" for="filterPrice">Price:</label>
+            <select id="filterPrice" class="filter-select">
+              <option value="all">All Prices</option>
+              <option value="under10k">Under ₹10,000</option>
+              <option value="10k-30k">₹10,000 – ₹30,000</option>
+              <option value="above30k">Above ₹30,000</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label" for="filterRating">Rating:</label>
+            <select id="filterRating" class="filter-select">
+              <option value="all">All Ratings</option>
+              <option value="4.5">4.5★ & above</option>
+              <option value="4.0">4.0★ & above</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label" for="filterMerchant">Merchant:</label>
+            <select id="filterMerchant" class="filter-select">
+              <option value="all">All Merchants</option>
+              <option value="keychron_in">Keychron India</option>
+              <option value="sonyindia">Sony India</option>
+              <option value="dell_india">Dell India</option>
+              <option value="lgelectronics">LG Electronics</option>
+              <option value="logitech_in">Logitech India</option>
+              <option value="samsung_in">Samsung India</option>
+              <option value="mechkeys_in">MechKeys Hub</option>
+              <option value="genesis_pc">Genesis PC</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label" for="sortProducts">Sort:</label>
+            <select id="sortProducts" class="filter-select">
+              <option value="recommended">Recommended (AI Match)</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+              <option value="rating_desc">Rating: High to Low</option>
+            </select>
+          </div>
+
+          <div class="filter-group filter-checkbox-wrap">
+            <label class="filter-checkbox-label">
+              <input type="checkbox" id="filterInStockOnly" />
+              <span>In-Stock Only</span>
+            </label>
+          </div>
+
+          <button id="resetFiltersBtn" class="btn-reset-filters" title="Reset all filters">
+            Reset
+          </button>
+        </div>
+
         <div id="productsGrid" class="products-grid">
           <!-- Dynamically populated product cards -->
         </div>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgLaptop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="screenLaptop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="accentCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" rx="16" fill="url(#bgLaptop)"/>
+  <!-- Display Lid -->
+  <rect x="80" y="45" width="240" height="150" rx="10" fill="#334155" stroke="#64748b" stroke-width="2"/>
+  <!-- Display Panel -->
+  <rect x="88" y="53" width="224" height="134" rx="6" fill="url(#screenLaptop)"/>
+  <!-- Screen Graphic -->
+  <circle cx="200" cy="110" r="28" fill="none" stroke="url(#accentCyan)" stroke-width="4"/>
+  <path d="M 190 100 L 215 110 L 190 120 Z" fill="url(#accentCyan)"/>
+  <rect x="120" y="155" width="160" height="6" rx="3" fill="#38bdf8" opacity="0.6"/>
+  <!-- Laptop Base Chassis -->
+  <path d="M 50 205 L 350 205 L 330 225 L 70 225 Z" fill="#475569" stroke="#64748b" stroke-width="2"/>
+  <!-- Trackpad Notch -->
+  <rect x="175" y="206" width="50" height="4" rx="2" fill="#1e293b"/>
+  <text x="200" y="260" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#94a3b8" text-anchor="middle" letter-spacing="1">PRO DEVELOPER LAPTOP</text>
+</svg>

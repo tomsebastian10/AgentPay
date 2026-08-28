@@ -19,7 +19,7 @@ export const IntentConstraintSchema = z.object({
 export class GeminiIntentExtractor {
   constructor(apiKey = config.llm.geminiApiKey) {
     this.apiKey = apiKey;
-    this.modelName = 'gemini-1.5-flash';
+    this.modelName = 'gemini-3.6-flash';
   }
 
   /**
@@ -82,7 +82,7 @@ ${sanitizedQuery}
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.modelName}:generateContent?key=${this.apiKey}`;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s — free tier can be slow
 
     try {
       const response = await fetch(url, {
@@ -123,6 +123,10 @@ ${sanitizedQuery}
       return this.validateLlmOutput(rawJson, sanitizedQuery);
     } catch (err) {
       clearTimeout(timeoutId);
+      // Translate AbortError into a human-readable message (never expose key)
+      if (err.name === 'AbortError' || err.message === 'This operation was aborted') {
+        throw new Error('Gemini API request timed out after 30s');
+      }
       throw err;
     }
   }

@@ -10,6 +10,7 @@ let selectedForCompare = new Set();
 let systemStatus = null;
 let userProfile = null;
 let activeQuoteTTLInterval = null;
+let currentCandidateScores = {};
 
 // DOM Elements
 const chatHistory = document.getElementById('chatHistory');
@@ -21,6 +22,15 @@ const productsGrid = document.getElementById('productsGrid');
 const heroRecommendationCard = document.getElementById('heroRecommendationCard');
 const floatingCompareBar = document.getElementById('floatingCompareBar');
 const compareCountLabel = document.getElementById('compareCountLabel');
+
+// Filter & Sort Elements
+const filterCategory = document.getElementById('filterCategory');
+const filterPrice = document.getElementById('filterPrice');
+const filterRating = document.getElementById('filterRating');
+const filterMerchant = document.getElementById('filterMerchant');
+const sortProducts = document.getElementById('sortProducts');
+const filterInStockOnly = document.getElementById('filterInStockOnly');
+const resetFiltersBtn = document.getElementById('resetFiltersBtn');
 
 // Modals & Drawers
 const productDetailModal = document.getElementById('productDetailModal');
@@ -46,6 +56,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       chatForm.dispatchEvent(new Event('submit'));
     });
   });
+
+  // Setup Filter & Sort Listeners
+  if (filterCategory) filterCategory.addEventListener('change', applyCatalogFiltersAndSort);
+  if (filterPrice) filterPrice.addEventListener('change', applyCatalogFiltersAndSort);
+  if (filterRating) filterRating.addEventListener('change', applyCatalogFiltersAndSort);
+  if (filterMerchant) filterMerchant.addEventListener('change', applyCatalogFiltersAndSort);
+  if (sortProducts) sortProducts.addEventListener('change', applyCatalogFiltersAndSort);
+  if (filterInStockOnly) filterInStockOnly.addEventListener('change', applyCatalogFiltersAndSort);
+  if (resetFiltersBtn) {
+    resetFiltersBtn.addEventListener('click', () => {
+      if (filterCategory) filterCategory.value = 'all';
+      if (filterPrice) filterPrice.value = 'all';
+      if (filterRating) filterRating.value = 'all';
+      if (filterMerchant) filterMerchant.value = 'all';
+      if (sortProducts) sortProducts.value = 'recommended';
+      if (filterInStockOnly) filterInStockOnly.checked = false;
+      applyCatalogFiltersAndSort();
+    });
+  }
 
   // Setup Navigation Buttons
   document.getElementById('profileBtn').addEventListener('click', openProfileModal);
@@ -126,16 +155,79 @@ async function loadCatalog() {
     const res = await fetch('/api/commerce/catalog');
     const data = await res.json();
     catalogProducts = data.products || [];
-    renderProductsGrid(catalogProducts);
+    applyCatalogFiltersAndSort();
   } catch (err) {
     console.error('Failed to load catalog:', err);
   }
 }
 
 // ==========================================================================
-// 3. Render Discovered Products Grid
+// 3. Filter, Sort & Render Products Grid
 // ==========================================================================
+function applyCatalogFiltersAndSort() {
+  const selectedCat = filterCategory ? filterCategory.value : 'all';
+  const selectedPrice = filterPrice ? filterPrice.value : 'all';
+  const selectedRating = filterRating ? filterRating.value : 'all';
+  const selectedMerchant = filterMerchant ? filterMerchant.value : 'all';
+  const selectedSort = sortProducts ? sortProducts.value : 'recommended';
+  const inStockOnly = filterInStockOnly ? filterInStockOnly.checked : false;
+
+  let filtered = [...catalogProducts].filter(p => {
+    // Category filter
+    if (selectedCat !== 'all' && p.category.toLowerCase() !== selectedCat.toLowerCase()) {
+      return false;
+    }
+
+    // Price range filter
+    if (selectedPrice === 'under10k' && p.priceINR >= 10000) return false;
+    if (selectedPrice === '10k-30k' && (p.priceINR < 10000 || p.priceINR > 30000)) return false;
+    if (selectedPrice === 'above30k' && p.priceINR <= 30000) return false;
+
+    // Rating filter
+    if (selectedRating === '4.5' && p.rating < 4.5) return false;
+    if (selectedRating === '4.0' && p.rating < 4.0) return false;
+
+    // Merchant filter
+    if (selectedMerchant !== 'all' && p.merchantId !== selectedMerchant) return false;
+
+    // In-Stock only filter
+    if (inStockOnly && (!p.inStock || p.stockCount <= 0)) return false;
+
+    return true;
+  });
+
+  // Apply sorting
+  filtered.sort((a, b) => {
+    if (selectedSort === 'price_asc') {
+      return a.priceINR - b.priceINR;
+    }
+    if (selectedSort === 'price_desc') {
+      return b.priceINR - a.priceINR;
+    }
+    if (selectedSort === 'rating_desc') {
+      return (b.rating || 0) - (a.rating || 0);
+    }
+    // Default / Recommended: sort by AI candidate match score, then rating
+    const scoreA = currentCandidateScores[a.id]?.totalScore || 0;
+    const scoreB = currentCandidateScores[b.id]?.totalScore || 0;
+    if (scoreB !== scoreA) return scoreB - scoreA;
+    return (b.rating || 0) - (a.rating || 0);
+  });
+
+  renderProductsGrid(filtered, currentCandidateScores);
+}
+
 function renderProductsGrid(products, candidateScores = {}) {
+  if (products.length === 0) {
+    productsGrid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--text-dim);">
+        <p style="font-size: 1.1rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.4rem;">No matching products found</p>
+        <p style="font-size: 0.82rem;">Try relaxing your filter criteria or reset filters above.</p>
+      </div>
+    `;
+    return;
+  }
+
   productsGrid.innerHTML = products.map(product => {
     const isOutOfStock = !product.inStock || product.stockCount <= 0;
     const isSelected = selectedForCompare.has(product.id);
@@ -143,9 +235,9 @@ function renderProductsGrid(products, candidateScores = {}) {
     const scoreBadge = score ? `<span class="badge-pill" style="background: rgba(16,185,129,0.15); color: var(--accent-emerald);">Match: ${Math.round(score.totalScore * 100)}%</span>` : '';
 
     const specTags = [
-      product.specs?.layout,
-      product.specs?.switchType ? product.specs.switchType.split('(')[0].trim() : null,
-      product.specs?.soundProfile ? product.specs.soundProfile.split('/')[0].trim() : null
+      product.specs?.layout || product.specs?.type || product.specs?.resolution,
+      product.specs?.switchType ? product.specs.switchType.split('(')[0].trim() : (product.specs?.sensor || product.specs?.processor || null),
+      product.specs?.soundProfile ? product.specs.soundProfile.split('/')[0].trim() : (product.specs?.refreshRate || product.specs?.noiseCancellation ? 'ANC' : null)
     ].filter(Boolean);
 
     return `
@@ -165,7 +257,12 @@ function renderProductsGrid(products, candidateScores = {}) {
         </div>
 
         <div class="card-img-wrap">
-          <img src="${product.imageUrl || '/images/products/keychron-k2.svg'}" alt="${product.title}" loading="lazy" />
+          <img 
+            src="${product.imageUrl || '/images/products/fallback-product.svg'}" 
+            alt="${product.title}" 
+            loading="lazy" 
+            onerror="this.onerror=null;this.src='/images/products/fallback-product.svg';"
+          />
         </div>
 
         <div class="card-body">
@@ -301,17 +398,9 @@ chatForm.addEventListener('submit', async (e) => {
 
       // Re-render catalog with match score badges and top ranking
       if (data.comparisonCandidates) {
-        const scoreMap = {};
-        data.comparisonCandidates.forEach(c => scoreMap[c.id] = c);
-        
-        // Sort catalog products matching candidates first
-        const sortedProducts = [...catalogProducts].sort((a, b) => {
-          const scoreA = scoreMap[a.id]?.totalScore || 0;
-          const scoreB = scoreMap[b.id]?.totalScore || 0;
-          return scoreB - scoreA;
-        });
-
-        renderProductsGrid(sortedProducts, scoreMap);
+        currentCandidateScores = {};
+        data.comparisonCandidates.forEach(c => currentCandidateScores[c.id] = c);
+        applyCatalogFiltersAndSort();
       }
     }
 
@@ -348,7 +437,9 @@ function renderConstraintsChips(constraints) {
 
 function renderHeroPickCard(proposal, constraints = {}) {
   heroRecommendationCard.classList.remove('hidden');
-  document.getElementById('heroImg').src = proposal.imageUrl || '/images/products/keychron-k2.svg';
+  const heroImgEl = document.getElementById('heroImg');
+  heroImgEl.src = proposal.imageUrl || '/images/products/fallback-product.svg';
+  heroImgEl.onerror = () => { heroImgEl.src = '/images/products/fallback-product.svg'; };
   document.getElementById('heroTitle').textContent = proposal.productTitle;
   
   const sourceLabel = constraints.extractionSource === 'gemini_llm' ? '✨ Gemini AI Intent' : '⚡ Offline Intent Engine';
@@ -364,7 +455,9 @@ window.openProductDetailModal = async function(productId) {
   const product = catalogProducts.find(p => p.id === productId);
   if (!product) return;
 
-  document.getElementById('detailModalImg').src = product.imageUrl || '/images/products/keychron-k2.svg';
+  const detailImgEl = document.getElementById('detailModalImg');
+  detailImgEl.src = product.imageUrl || '/images/products/fallback-product.svg';
+  detailImgEl.onerror = () => { detailImgEl.src = '/images/products/fallback-product.svg'; };
   document.getElementById('detailModalTitle').textContent = product.title;
   document.getElementById('detailModalMerchant').textContent = `Sold by ${product.merchantName} (${Math.round(product.merchantTrustScore * 100)}% Trust Rating)`;
   document.getElementById('detailModalPrice').textContent = `₹${product.priceINR.toLocaleString('en-IN')}`;

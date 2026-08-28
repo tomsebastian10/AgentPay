@@ -231,7 +231,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 47,
     description: 'Industry-leading noise cancellation with eight microphones and two processors. Perfect for travel, deep focus, and calls. 30-hour battery life with LDAC Hi-Res Audio support.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/headphones.svg'
   },
   {
     id: 'prod_sony_wh1000xm4',
@@ -255,7 +255,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 62,
     description: 'Previous-generation XM4 flagship at a reduced price. Multipoint Bluetooth connection to two devices, Speak-to-Chat, and industry-leading ANC. Still among the very best wireless headphones available.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/headphones.svg'
   },
   {
     id: 'prod_samsung_galaxy_buds2_pro',
@@ -279,7 +279,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 29,
     description: 'Premium true wireless earbuds with 24-bit Hi-Fi sound and intelligent ANC. IPX7 waterproof. Best paired with Samsung Galaxy ecosystem for seamless switching and 360° spatial audio.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/headphones.svg'
   },
   {
     id: 'prod_sony_wf1000xm4',
@@ -303,7 +303,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 18,
     description: 'World\'s first LDAC-enabled truly wireless earbuds. Exceptional ANC in a compact IPX4 body. Ideal for travel and commuting with adaptive sound control.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/headphones.svg'
   },
   {
     id: 'prod_logi_zone_vibe_100',
@@ -327,7 +327,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 41,
     description: 'Ultra-lightweight wireless headset for comfortable all-day wear during work calls. With a professional-grade rotating boom microphone, 20-hour battery, and Bluetooth multi-device connectivity.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/headphones.svg'
   },
 
   // =========================================================================
@@ -355,7 +355,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 12,
     description: 'Professional QHD IPS gaming monitor with 165Hz refresh and 98% DCI-P3 colour accuracy. Ideal for programmers who also game, offering crisp text at 1440p and vivid colour reproduction.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/monitor.svg'
   },
   {
     id: 'prod_dell_p2723de',
@@ -379,7 +379,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 8,
     description: 'Professional IPS monitor with 90W USB-C power delivery, making it the ideal one-cable solution for laptop developers. Height and tilt adjustable stand, 99% sRGB for accurate colour work.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/monitor.svg'
   },
   {
     id: 'prod_samsung_ls27ag50',
@@ -403,7 +403,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 15,
     description: '27" Curved 1000R QHD monitor with 165Hz and deep VA panel contrast. Excellent value for dual-purpose gaming and development setups needing rich blacks and wide colour.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/monitor.svg'
   },
   {
     id: 'prod_lg_32un880',
@@ -427,7 +427,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 6,
     description: '32" 4K UHD professional monitor with a fully articulated Ergo arm stand. One-cable USB-C solution with 60W power delivery. Outstanding for long coding sessions demanding maximum vertical real-estate.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/monitor.svg'
   },
 
   // =========================================================================
@@ -455,7 +455,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 55,
     description: 'The professional\'s choice for precise, whisper-quiet productivity. MagSpeed scroll wheel covers 1000 lines per second. Silent electromagnetic clicks, 8000 DPI optical sensor, and connects to 3 devices.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/mouse.svg'
   },
   {
     id: 'prod_logi_mx_anywhere3',
@@ -479,7 +479,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 38,
     description: 'Compact travel companion with MagSpeed scroll and 8000 DPI. Ambidextrous design works on any surface including glass. Perfect partner to MX Keys for a silent, productive travel setup.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/mouse.svg'
   },
   {
     id: 'prod_logi_g502x',
@@ -503,7 +503,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 21,
     description: '25,600 DPI HERO sensor with zero smoothing, filtering, or acceleration. LIGHTSPEED wireless technology for ultra-reliable 1ms report rate. Adjustable click-force hysteresis for consistent actuation.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/mouse.svg'
   },
   {
     id: 'prod_samsung_galaxy_s_pen',
@@ -527,7 +527,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 27,
     description: 'Ultra-slim arc-form wireless mouse that snaps flat for easy packing. Bluetooth 5.0 with USB-C charging and BlueTrack sensor for reliable tracking on most surfaces.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/mouse.svg'
   },
 
   // =========================================================================
@@ -556,7 +556,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 9,
     description: 'The quintessential ultrabook for developers on the go. Razor-thin at 1.2kg, Core i7 performance, Wi-Fi 6E, Thunderbolt 4 connectivity, and a brilliant InfinityEdge display with minimal bezels.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/laptop.svg'
   },
   {
     id: 'prod_dell_xps15',
@@ -581,7 +581,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 5,
     description: 'The developer and creator powerhouse. OLED display, RTX 4060 for ML/GPU workloads, and Thunderbolt 4 for external displays. Upgradeable RAM up to 64GB for heavy compilation workloads.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/laptop.svg'
   },
   {
     id: 'prod_samsung_galaxy_book3_pro',
@@ -606,7 +606,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 7,
     description: 'Intel Evo certified ultra-slim laptop with a stunning Dynamic AMOLED 2X display, 22-hour battery life, and 1.17kg frame. Best-in-class Galaxy ecosystem integration for multi-device workflows.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/laptop.svg'
   },
   {
     id: 'prod_sony_vaio_fe',
@@ -631,7 +631,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 14,
     description: 'Practical everyday laptop from Sony VAIO with Core i5, a bright FHD IPS display, and a respectable 9-hour battery for daily business tasks and light programming.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/laptop.svg'
   },
 
   // =========================================================================
@@ -658,7 +658,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 88,
     description: 'The gold standard webcam for HD video calls. Full HD 1080p with autofocus, built-in dual stereo mics, and a physical privacy shutter. Universally compatible with Zoom, Teams, and streaming software.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/webcam.svg'
   },
   {
     id: 'prod_logi_brio_500',
@@ -681,7 +681,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 31,
     description: 'Premium webcam with AI auto-framing that keeps you centered during calls. RightLight Show compensates for extreme backlight or dark rooms. USB-C with a built-in magnetic mounting system.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/webcam.svg'
   },
   {
     id: 'prod_sony_wired_mdr',
@@ -705,7 +705,7 @@ export const RAW_CATALOG = [
     inStock: true,
     stockCount: 115,
     description: 'Affordable, lightweight wired headphones from Sony. Foldable swivel design for portability, 30mm neodymium drivers for clear audio, and a no-fuss 3.5mm jack. Perfect for students and casual listening.',
-    imageUrl: '/images/products/keychron-k2.svg'
+    imageUrl: '/images/products/headphones.svg'
   },
 
   // =========================================================================
