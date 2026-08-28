@@ -7,8 +7,20 @@ import { catalogService } from '../commerce/catalog.js';
 import { MERCHANTS } from '../commerce/merchants.js';
 import { auditStore } from '../database/audit_store.js';
 import { runAllBenchmarks } from '../evaluation/run_benchmarks.js';
+import { InputSanitizer } from '../agents/sanitizer.js';
 
 export const router = express.Router();
+
+// In-memory lightweight profile store
+let userProfile = {
+  name: 'Alex Rivera',
+  email: 'alex.rivera@example.com',
+  shippingAddress: 'Flat 402, Cyber Heights, Outer Ring Road, Bengaluru, Karnataka 560103',
+  currency: 'INR',
+  maxSingleTxnLimitINR: 15000,
+  preferredLayout: '75% Compact',
+  preferredOS: 'macOS & Windows'
+};
 
 // 1. Natural Language Shopping Intent
 router.post('/agent/chat', async (req, res) => {
@@ -22,6 +34,64 @@ router.post('/agent/chat', async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error('Chat endpoint error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 1b. Propose Specific Product (e.g. user clicked "Select" / "Buy" on any candidate card)
+router.post('/agent/propose-product', (req, res) => {
+  try {
+    const { productId, userBudgetINR, intentId: existingIntentId } = req.body;
+    if (!productId) {
+      return res.status(400).json({ error: 'productId is required' });
+    }
+
+    const product = catalogService.getProductById(productId);
+    if (!product) {
+      return res.status(404).json({ error: `Product ${productId} not found` });
+    }
+
+    const intentId = existingIntentId || `intent_${crypto.randomUUID()}`;
+    const quote = catalogService.createQuote(product.id, product.merchantId);
+
+    const proposal = {
+      intentId,
+      quoteId: quote.quoteId,
+      productId: product.id,
+      merchantId: product.merchantId,
+      merchantName: product.merchantName,
+      productTitle: product.title,
+      priceINR: product.priceINR,
+      pricePaise: product.pricePaise,
+      currency: 'INR',
+      userBudgetINR: userBudgetINR || product.priceINR,
+      reasoning: `User selected "${product.title}" by ${product.merchantName}. Backed by verified merchant with ${Math.round(product.merchantTrustScore * 100)}% trust rating and ${product.rating}★ user rating.`,
+      scoreBreakdown: {
+        featureScore: 100,
+        ratingScore: Math.round((product.rating / 5) * 100),
+        merchantTrustScore: Math.round(product.merchantTrustScore * 100),
+        budgetScore: 100,
+        inStock: product.inStock
+      },
+      validUntil: quote.validUntil,
+      specs: product.specs,
+      imageUrl: product.imageUrl
+    };
+
+    auditStore.logEvent({
+      intentId,
+      eventType: 'PROPOSAL_GENERATED',
+      status: 'SUCCESS',
+      details: proposal
+    });
+
+    res.json({
+      success: true,
+      intentId,
+      proposal
+    });
+  } catch (error) {
+    console.error('Propose product error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -177,6 +247,30 @@ router.get('/commerce/catalog', (req, res) => {
   });
 });
 
+// 6b. Single Product Detail
+router.get('/commerce/product/:id', (req, res) => {
+  const product = catalogService.getProductById(req.params.id);
+  if (!product) {
+    return res.status(404).json({ error: 'Product not found' });
+  }
+  res.json({ product });
+});
+
+// 6c. Multi-Product Comparison Matrix
+router.post('/commerce/compare', (req, res) => {
+  try {
+    const { productIds, userIntent } = req.body;
+    if (!productIds || !Array.isArray(productIds) || productIds.length < 2) {
+      return res.status(400).json({ error: 'productIds array with at least 2 IDs is required' });
+    }
+
+    const comparison = catalogService.compareProducts(productIds, userIntent);
+    res.json(comparison);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 // 7. Dynamic Price Override (for simulating Price Surge failure demonstration)
 router.post('/commerce/price-override', (req, res) => {
   const { productId, newPriceINR } = req.body;
@@ -219,10 +313,61 @@ router.post('/eval/run', async (req, res) => {
 router.get('/system/status', (req, res) => {
   res.json({
     status: 'online',
-    version: '1.0.0',
+    version: '1.1.0',
     gateway: razorpayAdapter.getMode(),
     auditLogsCount: auditStore.logs.length,
     timestamp: new Date().toISOString()
   });
+});
+
+// 11. Lightweight User Profile
+router.get('/user/profile', (req, res) => {
+  res.json({ profile: userProfile });
+});
+
+router.post('/user/profile', (req, res) => {
+  const updates = req.body;
+  userProfile = {
+    ...userProfile,
+    ...updates
+  };
+  res.json({ success: true, profile: userProfile });
+});
+
+// 12. Security: Inspect content for prompt injection (used by Dev Lab injection demo)
+//     SOURCE is always declared by the caller so the UI can report it accurately.
+
+router.post('/security/inspect-injection', (req, res) => {
+  try {
+    const { content, source, merchantId } = req.body;
+    if (!content || typeof content !== 'string') {
+      return res.status(400).json({ error: 'content string is required' });
+    }
+
+    const inspection = InputSanitizer.inspectForInjection(content);
+
+    auditStore.logEvent({
+      intentId: `injection_probe_${Date.now()}`,
+      eventType: 'INJECTION_INSPECTION',
+      status: inspection.isMalicious ? 'VIOLATION_BLOCKED' : 'CLEAN',
+      details: {
+        source: source || 'unknown',
+        merchantId: merchantId || null,
+        isMalicious: inspection.isMalicious,
+        detectedPattern: inspection.detectedPattern || null
+      }
+    });
+
+    res.json({
+      isMalicious: inspection.isMalicious,
+      source: source || 'unknown',
+      merchantId: merchantId || null,
+      detectedPattern: inspection.detectedPattern || null,
+      reason: inspection.reason || null
+    });
+  } catch (error) {
+    console.error('Injection inspection error:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 

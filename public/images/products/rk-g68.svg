@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+  <defs>
+    <linearGradient id="rkg68bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181b"/>
+      <stop offset="100%" stop-color="#27272a"/>
+    </linearGradient>
+    <linearGradient id="rkg68rgb" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ec4899"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#rkg68bg)" rx="16"/>
+  <g transform="translate(30, 30)">
+    <rect x="0" y="0" width="340" height="175" rx="12" fill="#18181b" stroke="url(#rkg68rgb)" stroke-width="2"/>
+    <g fill="#3f3f46">
+      <rect x="15" y="15" width="22" height="22" rx="4" fill="#ec4899"/>
+      <rect x="42" y="15" width="240" height="22" rx="4"/>
+      <rect x="288" y="15" width="38" height="22" rx="4" fill="#8b5cf6"/>
+      <rect x="15" y="42" width="310" height="22" rx="4"/>
+      <rect x="15" y="69" width="310" height="22" rx="4"/>
+      <rect x="15" y="96" width="310" height="22" rx="4"/>
+      <rect x="15" y="123" width="310" height="24" rx="4"/>
+    </g>
+    <rect x="90" y="123" width="120" height="24" rx="4" fill="url(#rkg68rgb)" opacity="0.9"/>
+    <text x="170" y="162" fill="#e4e4e7" font-family="'Outfit', sans-serif" font-size="11" font-weight="600" text-anchor="middle" letter-spacing="1">ROYAL KLUDGE RK G68 • 65% TRI-MODE</text>
+  </g>
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+  <defs>
+    <linearGradient id="rk84bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="rk84white" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#rk84bg)" rx="16"/>
+  <g transform="translate(25, 25)">
+    <!-- White chassis -->
+    <rect x="0" y="0" width="350" height="190" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+    <g fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1">
+      <rect x="15" y="15" width="320" height="140" rx="6"/>
+      <rect x="25" y="25" width="22" height="20" rx="3" fill="#3b82f6"/>
+      <rect x="300" y="25" width="25" height="20" rx="3" fill="#3b82f6"/>
+      <rect x="110" y="125" width="130" height="22" rx="3" fill="#64748b"/>
+    </g>
+    <text x="175" y="175" fill="#334155" font-family="'Outfit', sans-serif" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="1">ROYAL KLUDGE RK84 • 75% WHITE EDITION</text>
+  </g>
+</svg>

@@ -26,6 +26,60 @@ export const MERCHANTS = {
     isAuthorized: true,
     verifiedMerchantBadge: true
   },
+  sonyindia: {
+    id: 'sonyindia',
+    name: 'Sony India Official',
+    domain: 'sony.co.in',
+    rating: 4.7,
+    trustScore: 0.97,
+    isAuthorized: true,
+    verifiedMerchantBadge: true
+  },
+  lgelectronics: {
+    id: 'lgelectronics',
+    name: 'LG Electronics India',
+    domain: 'lg.com/in',
+    rating: 4.6,
+    trustScore: 0.96,
+    isAuthorized: true,
+    verifiedMerchantBadge: true
+  },
+  logitech_in: {
+    id: 'logitech_in',
+    name: 'Logitech India Store',
+    domain: 'logitech.com/in',
+    rating: 4.7,
+    trustScore: 0.97,
+    isAuthorized: true,
+    verifiedMerchantBadge: true
+  },
+  dell_india: {
+    id: 'dell_india',
+    name: 'Dell India Official',
+    domain: 'dell.com/en-in',
+    rating: 4.5,
+    trustScore: 0.96,
+    isAuthorized: true,
+    verifiedMerchantBadge: true
+  },
+  samsung_in: {
+    id: 'samsung_in',
+    name: 'Samsung India Official',
+    domain: 'samsung.com/in',
+    rating: 4.6,
+    trustScore: 0.97,
+    isAuthorized: true,
+    verifiedMerchantBadge: true
+  },
+  primetech_in: {
+    id: 'primetech_in',
+    name: 'PrimeTech India',
+    domain: 'primetech.in',
+    rating: 4.4,
+    trustScore: 0.90,
+    isAuthorized: true,
+    verifiedMerchantBadge: true
+  },
   unauthorized_deals: {
     id: 'unauthorized_deals',
     name: 'Shady Deals Hub',
