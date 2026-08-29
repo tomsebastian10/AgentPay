@@ -1,7 +1,7 @@
 # Technical Research: Razorpay & Agentic Commerce Architecture
 
 ## 1. Overview
-This document compiles verified technical specifications for Razorpay APIs (Test Mode), cryptographic verification, webhook handling, and emerging Agentic Commerce standards (MCP, AP2, ACP, x402) for the **AgentPay** prototype.
+This document records background research for the **AgentPay** prototype. Implemented behavior is limited to the current Node.js application: Razorpay Test Mode order creation when configured, a mock gateway, local HMAC verification, internal x402-style quotes, and AP2-style internal spend tokens.
 
 ---
 
@@ -41,8 +41,8 @@ Orders must be created on the backend before initiating payment.
   }
   ```
 
-### 2.3 Razorpay Payments & Capture (`GET /v1/payments/{payment_id}`)
-- Fetches detailed payment state.
+### 2.3 Razorpay Payments & Capture (`GET /v1/payments/{payment_id}`) — Research Reference
+- Razorpay can fetch detailed payment state. AgentPay does not currently call this endpoint.
 - **Status Lifecycle:** `created` ➔ `authorized` ➔ `captured` (or `failed` / `refunded`).
 - In test mode, payments can be simulated as successful or failed based on test instrument credentials or simulated endpoints.
 
@@ -85,7 +85,9 @@ $$\text{Expected Signature} = \text{HMAC-SHA256}(\text{order\_id} + "|" + \text{
 
 ---
 
-## 4. Razorpay Webhooks (`POST /api/webhooks/razorpay`)
+## 4. Razorpay Webhooks — Research Reference
+
+AgentPay does not currently expose a webhook endpoint. The local `PaymentVerifier` verifies payment signatures supplied to `/api/agent/verify-payment`.
 
 ### 4.1 Supported Events
 - `order.paid`: Triggered when an order is successfully paid.
@@ -102,17 +104,17 @@ $$\text{Expected Signature} = \text{HMAC-SHA256}(\text{order\_id} + "|" + \text{
 
 | Protocol / Standard | Purpose in AgentPay | Status & Verification |
 |---|---|---|
-| **Model Context Protocol (MCP)** | Exposes standardized tools (Catalog Search, Quote Fetching, Policy Verification, Order Creation) to AI models via JSON-RPC. | **Verified Standard** (Anthropic open standard, adopted by Razorpay Agent Studio). |
-| **Agent Payment Protocol (AP2) / ACP** | Cryptographic authorization token (`SpendAuthorizationToken`) containing bounded budget, merchant constraints, nonce, and user signature. | **Domain Pattern** (Implemented natively as a deterministic JWT/HMAC token in AgentPay). |
-| **x402 (HTTP 402 Payment Required)** | Protocol for merchant APIs to return structured quote invoices and payment requirements to automated agents. | **Standardized Specification** (RFC HTTP 402 pattern implemented for merchant quote endpoints). |
+| **Model Context Protocol (MCP)** | Background standard for exposing tools to AI models. | Not implemented in AgentPay. |
+| **Agent Payment Protocol (AP2) / ACP** | Pattern for bounded authorization tokens. | Implemented as an internal HMAC-SHA256 spend-token pattern, not a JWT or external protocol integration. |
+| **x402 (HTTP 402 Payment Required)** | Pattern for merchant quotes and payment requirements. | AgentPay creates internal x402-style quote objects; it does not expose HTTP 402 merchant endpoints. |
 
 ---
 
 ## 6. Security Invariants & Adversarial Defense
 
 1. **Prompt Injection Boundary Isolation:**
-   - Merchant-provided product titles and descriptions are processed through a strict JSON parser with zero-shot system boundary framing.
-   - Descriptions are never fed raw into prompt templates without markdown/text sanitization.
+   - User input is inspected and sanitized before intent extraction; merchant content is sanitized before scoring and unauthorized merchants are excluded.
+   - The deterministic policy layer, not an LLM, makes all payment decisions.
 2. **Deterministic Price Clamping:**
    - The AI Agent generates a `PurchaseProposal`.
    - The `PolicyEngine` checks:
@@ -121,12 +123,12 @@ $$\text{Expected Signature} = \text{HMAC-SHA256}(\text{order\_id} + "|" + \text{
      $$\text{merchant\_id} \in \text{authorized\_merchants}$$
      $$\text{currency} == \text{user\_currency}$$
 3. **Idempotency & Replay Defense:**
-   - Every purchase intent generates a unique `intent_uuid`.
-   - The policy engine rejects any repeated execution attempt with the same `intent_uuid`.
+   - Every spend token contains a unique nonce.
+   - The policy engine rejects a nonce after it has been consumed.
 
 ---
 
 ## 7. Integration & Simulation Strategy
 
-- **Real Integration:** Real Razorpay Test Mode API calls for Orders, Verification, and Status fetching when `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` are supplied in `.env`.
-- **Test Mode Simulation Layer:** A clearly labeled mock provider (`RazorpayMockProvider`) active when credentials are in mock mode or for automated CI/synthetic evaluation runs, returning exact Razorpay schema responses without external network dependencies.
+- **Real Test Mode:** With valid `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET`, the adapter creates Razorpay orders through the SDK. Payment signatures are verified locally with HMAC-SHA256.
+- **Mock gateway:** Without Test Mode configuration, `MockRazorpayProvider` supplies deterministic in-memory orders and payment outcomes for offline use and evaluation.

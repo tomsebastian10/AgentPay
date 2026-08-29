@@ -1,173 +1,77 @@
 # System Architecture & Technical Design: AgentPay
 
-## 1. High-Level Architecture Overview
+## Overview
 
-AgentPay adopts a **Dual-Engine Modular Monolith** architecture designed for maximum security, deterministic financial boundaries, and lightning-fast execution.
+AgentPay is a Node.js 18+ ES-module modular monolith built with Express. It separates optional AI-assisted intent extraction from deterministic commerce, authorization, and payment safeguards.
 
 ```
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                                   CLIENT / FRONTEND                                    │
-│  - AI Shopping Chat Interface          - Product Comparison Matrix                      │
-│  - Interactive Spend Authorization     - Live Razorpay Checkout Modal                   │
-│  - Real-Time Transaction Audit Trail   - Adversarial & Failure Scenario Simulator       │
-└───────────────────────────────────────────▲────────────────────────────────────────────┘
-                                            │ REST / JSON-RPC
-┌───────────────────────────────────────────▼────────────────────────────────────────────┐
-│                                 FASTAPI APPLICATION CORE                                │
-│                                                                                        │
-│  ┌───────────────────────────┐                ┌─────────────────────────────────────┐  │
-│  │   AI BUYER REASONING      │                │    DETERMINISTIC POLICY ENGINE      │  │
-│  │   ENGINE (Non-Deterministic)│               │    (Zero-Trust Gatekeeper)          │  │
-│  │                           │                │                                     │  │
-│  │ • Intent & Constraint     │   Proposes     │ • Budget Cap Verification           │  │
-│  │   Extractor               │  Transaction   │ • Price Invariance / Drift Guard    │  │
-│  │ • Prompt Injection Filter │───────────────►│ • Merchant Whitelist Validation     │  │
-│  │ • Multi-Product Scorer    │   Proposal     │ • AP2 / Spend Token Verification    │  │
-│  │ • Decision Explainer      │                │ • Anti-Replay / Idempotency Check   │  │
-│  └───────────────────────────┘                └──────────────────┬──────────────────┘  │
-│                                                                  │                     │
-│                                                    [ALLOWED]     │  [REJECTED]         │
-│                                                       │          │     │               │
-│                                                       ▼          ▼     ▼               │
-│  ┌───────────────────────────┐                ┌─────────────────────────────────────┐  │
-│  │    COMMERCE & CATALOGS    │                │       RAZORPAY PAYMENT GATEWAY      │  │
-│  │ • Multi-Merchant Network  │                │ • Razorpay Test Mode Client         │  │
-│  │ • x402 Real-Time Quotes   │                │ • Order Creation (`/v1/orders`)     │  │
-│  │ • Inventory Availability  │                │ • HMAC-SHA256 Signature Verifier    │  │
-│  └───────────────────────────┘                │ • Webhook Event Processor           │  │
-│                                               │ • Deterministic Fallback Simulator  │  │
-│                                               └─────────────────────────────────────┘  │
-│                                                                  │                     │
-│  ┌───────────────────────────────────────────────────────────────▼──────────────────┐  │
-│  │                           IMMUTABLE AUDIT TRAIL & SQLITE                         │  │
-│  │  Records: Intents, Extracted Constraints, Candidates, Quotes, Policy Decisions,  │  │
-│  │  Spend Tokens, Razorpay Order IDs, Payment Signatures, Gateway Responses         │  │
-│  └──────────────────────────────────────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────────────────────────────────────┘
+User request
+  → Buyer Agent
+  → Gemini intent extraction (optional) or deterministic offline intent engine
+  → Internal provider-shaped catalog discovery
+  → Deterministic product scoring and bounded proposal
+  → Explicit human authorization
+  → AP2-style HMAC-SHA256 spend authorization token
+  → Zero-Trust Policy Engine
+  → Razorpay Test Mode order or Mock Gateway order
+  → Local Razorpay HMAC verification and JSON-backed audit trail
 ```
 
----
+AI never directly controls money. Product discovery, scoring, policy validation, spend authorization, and payment verification remain deterministic.
 
-## 2. Component Specifications
+## Runtime Components
 
-### 2.1 AI Buyer Engine (`backend/agents/`)
-- **Intent Extractor:** Converts natural language (e.g., *"Find a wireless mechanical keyboard under ₹8,000"*) into a strongly-typed Pydantic `CommerceConstraint` schema:
-  - `category`: string
-  - `max_budget_inr`: float
-  - `currency`: `"INR"`
-  - `must_have_features`: list[string] (e.g. `["wireless", "mechanical"]`)
-  - `nice_to_have_features`: list[string]
-- **Adversarial Input Sanitizer:** Strips out jailbreaks, delimiter injections, and malicious system prompt overrides from merchant product titles/descriptions.
-- **Product Scorer & Decision Engine:** Evaluates merchant product candidates using normalized multi-criteria utility functions (Price fit, Feature match, Rating, Merchant trust score).
-- **Explanation Generator:** Formulates transparent, user-understandable justifications for why product X was chosen over product Y.
+| Component | Implementation | Responsibility |
+|---|---|---|
+| Server | Express, ES Modules | REST API and static frontend hosting. |
+| Buyer Agent | `server/agents/buyer_agent.js` | Sanitizes input, extracts intent, discovers products, scores candidates, and builds proposals. |
+| Gemini Extractor | Native `fetch`, Zod | Optional Gemini structured intent extraction; validates untrusted JSON. |
+| Offline Intent Engine | Deterministic rules | Handles intent extraction when Gemini is unconfigured, unavailable, times out, errors, or is quota-latched. |
+| Catalog | Internal in-memory provider | Normalized products, authorized-merchant filtering, stock, quotes, comparison, and price overrides for demos. |
+| Policy Engine | Deterministic checks | Validates token integrity, nonce, merchant, price drift, budget, system cap, and stock before payment. |
+| Payments | Razorpay SDK / mock provider | Creates real Test Mode orders when configured or deterministic mock orders otherwise. |
+| Audit Store | JSON-backed persistence | Stores audit events and consumed nonces in `data/audit_log.json`. |
+| Frontend | Static HTML/CSS/JavaScript | Chat, catalog, comparison, checkout, audit, and demo controls. |
 
-### 2.2 Deterministic Policy Layer (`backend/policies/`)
-Acts as the zero-trust gatekeeper between AI reasoning and financial transactions:
-- **Policy Invariants:**
-  1. $\text{Quote Amount} \le \text{Max Budget}$
-  2. $\text{Live Order Amount} == \text{Authorized Quote Amount}$ (Protects against dynamic price surging)
-  3. $\text{Currency} == \text{'INR'}$
-  4. $\text{Merchant ID} \in \text{Registered Merchants}$
-  5. $\text{Stock Quantity} \ge \text{Order Quantity}$
-  6. $\text{Authorization Token Nonce}$ is unused (Strict Idempotency).
-  7. $\text{Spend Token Expiration} > \text{Current Timestamp}$.
-- If any check fails, the policy layer immediately returns `POLICY_REJECTED` with an exact violation code. The payment layer is **never invoked**.
+## Gemini Intent Extraction
 
-### 2.3 Spend Authorization Tokens (AP2 Protocol Pattern)
-- When a user confirms a purchase proposal, the system issues a cryptographically signed `SpendAuthorizationToken`:
-  - `token_id`: UUIDv4
-  - `intent_id`: UUIDv4
-  - `product_id`: string
-  - `merchant_id`: string
-  - `authorized_amount_paise`: integer (e.g., `749900`)
-  - `currency`: `"INR"`
-  - `expires_at`: ISO timestamp (5-minute TTL)
-  - `user_signature`: HMAC-SHA256 signature generated with user session key.
+`GEMINI_API_KEY` is optional. When configured, Gemini is used only for natural-language intent classification and structured constraint extraction; Zod validates and normalizes the response before use.
 
-### 2.4 Razorpay Payment Gateway Adapter (`backend/payments/`)
-- **Real Razorpay Mode:**
-  - Calls `razorpay.Client.order.create()` with exact amount in paise.
-  - Verifies `razorpay_signature` via `razorpay.utility.verify_payment_signature()`.
-- **Test Mode Simulation Layer:**
-  - Clearly labeled mock engine that simulates standard Razorpay responses, webhook events, and test error conditions (e.g., `payment.failed`, `insufficient_funds`, `gateway_timeout`) for reproducible automated testing without network flakiness.
+If Gemini is missing, times out, errors, or returns an invalid result, the buyer agent uses the deterministic offline engine. An HTTP 429 or `RESOURCE_EXHAUSTED` response activates a process-local quota latch: the triggering request falls back immediately, later requests skip Gemini entirely, and restarting Node resets the latch.
 
-### 2.5 Multi-Merchant Catalog Engine (`backend/commerce/`)
-- Simulates realistic e-commerce merchants (e.g., *Keychron Direct, MechKeyboard Hub, TechVibe Electronics*).
-- Implements HTTP 402 / Quote API to generate signed, time-limited price quotes.
+## Purchase Flow
 
----
+1. The buyer agent returns a bounded product proposal and an x402-style internal quote.
+2. The user explicitly authorizes the proposal.
+3. The server issues an AP2-style spend token signed with HMAC-SHA256 and bound to intent, product, merchant, amount, nonce, and expiry.
+4. The policy engine deterministically checks token integrity, replay prevention, merchant authorization, live price drift, budget, system limit, and inventory.
+5. Only an allowed transaction creates a Razorpay Test Mode order or a mock order.
+6. The server verifies a payment callback signature locally with constant-time HMAC-SHA256 comparison and records audit events.
 
-## 3. Data Models & Schemas
+## Razorpay Modes
 
-```python
-class CommerceConstraint(BaseModel):
-    category: str
-    max_budget_inr: float
-    currency: str = "INR"
-    required_features: list[str] = []
-    preferred_brands: list[str] = []
+- **Razorpay Test Mode:** with valid Test Mode credentials, the adapter creates orders through the Razorpay SDK and the frontend can open Razorpay Checkout.
+- **Mock gateway:** without Test Mode configuration, the in-memory provider creates deterministic mock orders and payments for offline use, tests, and demos.
+- **Local verification:** payment signatures are verified by AgentPay's local HMAC-SHA256 verifier. The current application does not implement a webhook endpoint or Razorpay payment/status fetching.
 
-class Product(BaseModel):
-    id: str
-    merchant_id: str
-    merchant_name: str
-    title: str
-    description: str
-    price_inr: float
-    price_paise: int
-    features: list[str]
-    in_stock: bool
-    stock_count: int
-    rating: float
+## Security Invariants
 
-class PurchaseProposal(BaseModel):
-    intent_id: str
-    product_id: str
-    merchant_id: str
-    product_title: str
-    final_price_inr: float
-    final_price_paise: int
-    reasoning: str
-    comparison_summary: list[dict]
+- Prompt-injection inspection and sanitization for user input and merchant content.
+- Authorized merchant, budget, stock, system-limit, and live-price-drift validation.
+- AP2-style HMAC-SHA256 spend tokens with five-minute expiry and single-use nonce protection.
+- Constant-time Razorpay payment-signature verification.
+- JSON-backed audit events for intent, policy, order, payment, and security outcomes.
 
-class PolicyEvaluationResult(BaseModel):
-    allowed: bool
-    violations: list[str] = []
-    evaluated_at: str
-    policy_hash: str
-
-class AuditEvent(BaseModel):
-    id: str
-    timestamp: str
-    event_type: str  # INTENT_EXTRACTED | QUOTES_FETCHED | PROPOSAL_GENERATED | AUTHORIZATION_GRANTED | POLICY_CHECK | ORDER_CREATED | PAYMENT_VERIFIED | FAILURE_ABORTED
-    payload: dict
-    status: str
-```
-
----
-
-## 4. API Endpoints Specification
+## API Surface
 
 | Method | Path | Description |
 |---|---|---|
-| `POST` | `/api/agent/chat` | Receives user NL query, extracts constraints, queries catalogs, selects product, returns structured proposal. |
-| `POST` | `/api/agent/authorize` | User reviews proposal and signs `SpendAuthorizationToken`. |
-| `POST` | `/api/agent/execute-purchase` | Runs Policy Engine; if allowed, calls Razorpay Orders API (`/v1/orders`) and returns `order_id`. |
-| `POST` | `/api/agent/verify-payment` | Receives payment ID & signature, performs HMAC-SHA256 verification, captures order, updates audit log. |
-| `GET` | `/api/merchants/catalog` | Lists available merchant products. |
-| `GET` | `/api/audit/logs` | Fetches immutable audit trail events. |
-| `POST` | `/api/eval/run` | Triggers synthetic test suite and returns performance/safety metrics. |
-| `POST` | `/api/scenarios/simulate` | Triggers specific demonstration scenarios (Price Hike, Prompt Injection, Payment Failure). |
-
----
-
-## 5. Security & Invariant Guarantee Matrix
-
-| Threat / Edge Case | Protection Mechanism | Expected Outcome |
-|---|---|---|
-| **Prompt Injection in Merchant Catalog** | Strict JSON schema parsing + isolated markdown sanitizer + boundary prompts | Malicious instructions ignored; product scored purely on valid technical attributes. |
-| **Merchant Price Hike before Checkout** | Policy Engine compares `live_quote.price` with `authorized_token.price` | Transaction blocked immediately; User alerted of price drift. |
-| **Budget Exceeded** | Policy Engine hard clamps `price <= user_budget` | Transaction blocked; Agent explains budget breach. |
-| **Duplicate / Replay Attack** | Single-use Spend Token Nonce stored in SQLite | Second execution attempt rejected as `NONCE_ALREADY_USED`. |
-| **Forged Payment Signature** | Backend constant-time HMAC-SHA256 signature verification | Verification fails; Order marked `PAYMENT_UNVERIFIED_FRAUD`. |
-| **Payment Gateway Downtime / Failure** | Error interception & recovery handler | Clear failure notification; Audit log marked `PAYMENT_FAILED`. |
+| `POST` | `/api/agent/chat` | Extracts intent and returns a deterministic product proposal when applicable. |
+| `POST` | `/api/agent/authorize` | Issues an AP2-style spend token after user approval. |
+| `POST` | `/api/agent/execute-purchase` | Runs policy validation and creates an order when allowed. |
+| `POST` | `/api/agent/verify-payment` | Locally verifies a Razorpay-style HMAC signature. |
+| `POST` | `/api/agent/simulate-payment` | Produces mock payment results for offline/test flows. |
+| `GET` | `/api/commerce/catalog` | Returns the internal catalog and merchant registry. |
+| `POST` | `/api/commerce/compare` | Compares two or three catalog products. |
+| `GET` | `/api/audit/logs` | Returns JSON-backed audit events. |
+| `POST` | `/api/eval/run` | Runs the ten synthetic benchmark scenarios. |

@@ -2,10 +2,10 @@
 
 [![Buildathon](https://img.shields.io/badge/Razorpay%20AI%20Buildathon-2026-blue.svg)](https://razorpay.com/buildathon/)
 [![Track](https://img.shields.io/badge/Track-AI%20Growth%20%26%20Agentic%20Commerce-indigo.svg)]()
-[![Tests](https://img.shields.io/badge/Tests-27%2F27%20Passing-success.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-29%2F29%20Passing-success.svg)]()
 [![Benchmarks](https://img.shields.io/badge/Evaluation-100%25%20Pass%20Rate-brightgreen.svg)]()
 
-> **AgentPay** is a production-grade Agentic Commerce prototype demonstrating an AI Buyer discovering merchant catalogs, extracting natural language constraints via Google Gemini with deterministic offline fallback, classifying intent (conversational, ambiguous, commerce), evaluating multi-attribute commerce options, and executing bounded, cryptographically-authorized payments via **Razorpay Test Mode** with **Zero-Trust Deterministic Policy Safeguards**.
+> **AgentPay** is an Agentic Commerce prototype that optionally uses Google Gemini for intent extraction, then deterministically discovers, scores, authorizes, and safeguards purchases through Razorpay Test Mode or its offline mock gateway.
 
 ---
 
@@ -14,7 +14,7 @@
 As commerce transitions from human browser clicks to autonomous AI agents, financial safety is paramount. LLMs are non-deterministic and susceptible to prompt injection, price drift, and hallucinated spending.
 
 **AgentPay** solves this through a **Dual-Engine Architecture**:
-1. **AI Buyer Reasoning Engine:** Handles natural language intent classification (conversational greetings vs. ambiguous queries vs. specific commerce), constraint extraction (powered by Google Gemini Free Tier with zero-dependency fallback), catalog discovery across verified merchants, candidate scoring, and human explanation.
+1. **Buyer Agent:** Uses optional Gemini or a deterministic offline engine for natural-language intent classification and structured constraint extraction. Product discovery, candidate scoring, and explanations are deterministic.
 2. **Deterministic Policy Gatekeeper:** A zero-trust layer enforcing strict mathematical budget limits, real-time price invariance, merchant whitelist verification, cryptographic AP2 token signatures, and anti-replay nonces with **zero LLM involvement in financial decisions**.
 
 ---
@@ -25,7 +25,7 @@ As commerce transitions from human browser clicks to autonomous AI agents, finan
 User's Natural-Language Request
               │
               ▼
-(1) AI Intent Classification & Extraction (Google Gemini / Offline Fallback)
+(1) Intent Classification & Extraction (Optional Gemini / Deterministic Offline Engine)
     ├── Conversational (Greetings, Help) ──► Natural Assistant Reply (No Discovery)
     ├── Ambiguous ("something for work") ──► Category Clarification Prompt
     └── Commerce Intent ─────────────────► Structured Constraints Schema (null budget preserved)
@@ -34,7 +34,7 @@ User's Natural-Language Request
 (2) Product Discovery across Pluggable Merchant Catalogs (Keyboards, Audio, Monitors, Mice, Laptops)
               │
               ▼
-(3) Multi-Attribute Scoring & Comparison Matrix (Feature Match, Rating, Merchant Trust, Price)
+(3) Deterministic Multi-Attribute Scoring & Comparison Matrix (Feature Match, Rating, Merchant Trust, Price)
               │
               ▼
 (4) Bounded Purchase Proposal & Human Explanation (x402 Protocol Quote with TTL)
@@ -48,10 +48,10 @@ User's Natural-Language Request
               ▼
 (7) Zero-Trust Deterministic Policy Verification
     ├── [REJECTED] ──► Blocked with Exact Violation Code & Audit Event
-    └── [ALLOWED]  ──► Razorpay Order Creation (`/v1/orders`)
+    └── [ALLOWED]  ──► Razorpay Test Mode Order Creation or Mock Gateway Order
                             │
                             ▼
-                      Razorpay Checkout Modal / Test Mode Capture
+                      Razorpay Checkout (Test Mode) / Deterministic Mock Payment
                             │
                             ▼
                       Constant-Time HMAC-SHA256 Signature Verification (`crypto.timingSafeEqual`)
@@ -73,6 +73,16 @@ User's Natural-Language Request
 | **Tampered / Forged Gateway Signature** | Constant-time HMAC-SHA256 verification | Tampered gateway callback rejected; payment not authorized. |
 | **Gateway Failure / Card Decline** | Gateway error interceptor | Honestly reported as `PAYMENT_FAILED` (never false success). |
 
+Gemini is optional. `GEMINI_API_KEY` enables Gemini intent extraction, whose JSON output is validated by Zod. Missing configuration, errors, timeouts, or quota exhaustion use the offline engine. After a Gemini HTTP 429 / `RESOURCE_EXHAUSTED`, the process-local latch skips Gemini until the server restarts. AI never directly controls money.
+
+## 🧱 Implementation Stack
+
+- Node.js 18+, Express, and ES Modules
+- Zod, native `fetch` for Gemini, and the Razorpay SDK
+- Internal in-memory catalog with provider-shaped interfaces
+- JSON-backed audit persistence
+- Static HTML, CSS, and JavaScript frontend
+
 ---
 
 ## 🚀 Quickstart
@@ -83,7 +93,7 @@ User's Natural-Language Request
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/AgentPay.git
+git clone https://github.com/tomsebastian10/AgentPay
 cd AgentPay
 
 # Install dependencies
@@ -115,7 +125,7 @@ GEMINI_API_KEY=your_gemini_api_key
 ```bash
 node --test tests/**/*.test.js
 ```
-*Executes 27 comprehensive unit tests across policy, security, payment, Gemini LLM extractor, intent classification, and commerce modules.*
+*Executes 29 comprehensive unit tests across policy, security, payment, Gemini intent extraction, intent classification, and commerce modules.*
 
 ### Run 10-Scenario Synthetic Benchmark Suite
 ```bash
@@ -161,7 +171,7 @@ AgentPay/
 │   ├── index.html               # Glassmorphic AgentPay Dashboard with Drawer & Lab
 │   ├── styles.css               # Modern CSS theme, tokens, & responsive layout
 │   └── app.js                   # Client shopping application with honest AI badges
-├── tests/                       # Complete unit and integration test suite (27 tests)
+├── tests/                       # Complete unit and integration test suite (29 tests)
 ├── PROJECT_STATE.md             # Canonical project state
 ├── package.json                 # Dependency manifest
 └── .gitignore                   # Clean ignore rules

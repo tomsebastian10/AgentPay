@@ -1,12 +1,12 @@
 # Project State
 
 ## Current Phase
-STAGE 24 — Product Imagery & Multi-Attribute Catalog Filtering / Sorting (Completed)
+STAGE 26 — Documentation Consistency Pass (Completed)
 
 ## Completed
 - **STAGE 0 — Challenge Research:** Documented official track requirements in `docs/challenge-analysis.md`.
 - **STAGE 1 — Technical Research:** Documented Razorpay Test Mode APIs (Orders, Checkout, Payments, HMAC verification, Webhooks) and Agentic protocols (MCP, AP2/ACP, x402) in `docs/technical-research.md`.
-- **STAGE 2 & 3 — System Design & Architecture:** Detailed dual-engine modular monolith, Pydantic schemas, and security invariants in `docs/architecture.md`.
+- **STAGE 2 & 3 — System Design & Architecture:** Documented the dual-engine modular monolith and security invariants in `docs/architecture.md`.
 - **STAGE 4 — Repository Foundation:** Initialized Node.js ES Modules environment with Express, Razorpay SDK, Zod, and Cors.
 - **STAGE 5 — AI Buyer Reasoning Engine:** Implemented `buyer_agent.js`, `sanitizer.js`, and `prompts.js` for constraint extraction, adversarial defense, candidate scoring, and reasoning.
 - **STAGE 6 & 7 — Merchant Interface & Product Discovery:** Implemented `merchants.js` and `catalog.js` with x402 quotes, stock tracking, and multi-merchant search.
@@ -15,7 +15,7 @@ STAGE 24 — Product Imagery & Multi-Attribute Catalog Filtering / Sorting (Comp
 - **STAGE 11 — Audit Trail:** Implemented persistent `audit_store.js` recording all transaction steps immutably.
 - **STAGE 12 — Evaluation Suite:** Implemented `run_benchmarks.js` and `scenarios.js` covering 10 synthetic commerce scenarios.
 - **STAGE 13 — Dashboard UI:** Built modern glassmorphic web dashboard in `public/index.html`, `public/styles.css`, and `public/app.js`.
-- **STAGE 14 & 15 — Security & End-to-End Testing:** 27 unit tests passing + live E2E integration tests passing.
+- **STAGE 14 & 15 — Security & End-to-End Testing:** Unit and live E2E integration coverage established.
 - **STAGE 16 & 17 — Documentation & Demo Preparation:** Created `README.md` and `docs/demo-guide.md`.
 - **STAGE 18 & 19 — AI Commerce Experience & Architecture Expansion:**
   1. Product details view & modal with rich specifications, switch acoustics, and verified merchant badges.
@@ -36,7 +36,7 @@ STAGE 24 — Product Imagery & Multi-Attribute Catalog Filtering / Sorting (Comp
   4. AI honesty in UI (`✨ AI Intent Extraction — Gemini` vs `⚡ Offline Intent Engine`).
 - **STAGE 23 — Final Implementation Audit & Submission Readiness Review:**
   1. Verified all 8 core priorities.
-  2. Verified test pass rates (27 unit tests, 10 benchmarks, 7 E2E checks).
+  2. Verified test pass rates (29 unit tests, 10 benchmarks, 7 E2E checks).
 - **STAGE 24 — Product Imagery & Multi-Attribute Catalog Filtering / Sorting:**
   1. **Category-Specific Vector Imagery:** Created and mapped clean, responsive vector illustrations for all 29 products (Keyboards, ANC Headphones, Displays/Monitors, Ergonomic Mice, Developer Laptops, and Webcams) with automatic fallback `onerror="this.src='/images/products/fallback-product.svg'"`.
   2. **Multi-Attribute Filter & Sort Controls:** Added glassmorphic toolbar allowing users to refine displayed products by Category, Price Range, Minimum Rating, Merchant Whitelist, and In-Stock Status.
@@ -44,9 +44,10 @@ STAGE 24 — Product Imagery & Multi-Attribute Catalog Filtering / Sorting (Comp
 
 ## Latest Completed Change
 - **Gemini Quota-Exhaustion Offline Fallback Latch:** HTTP 429 / `RESOURCE_EXHAUSTED` disables Gemini for the current Node process, and subsequent intent extraction uses the deterministic engine until restart.
+- **Documentation Consistency Pass:** Aligned implementation documentation with the Node.js/Express stack, JSON-backed audit store, optional Gemini fallback behavior, and supported Razorpay Test Mode/mock flows.
 
 ## Current Task
-Gemini quota-exhaustion fallback latch complete. All 29 unit tests, 10 synthetic benchmarks, and 7 live E2E server checks passing at 100%.
+Documentation consistency pass complete. All 29 unit tests, 10 synthetic benchmarks, and 7 live E2E server checks passing at 100%.
 
 ## Next Tasks
 1. Pitch demo recording following `docs/demo-guide.md`.
@@ -57,7 +58,7 @@ Gemini quota-exhaustion fallback latch complete. All 29 unit tests, 10 synthetic
 - **Zero-Trust for AI & Merchants:** Free-form AI output cannot directly trigger financial movements; merchant descriptions are treated as untrusted strings and sanitized against prompt injections.
 - **Null Unspecified Budget:** Unspecified shopping budget in natural language queries does not trigger artificial hard limits during discovery; financial authorization limits are strictly enforced at the policy layer.
 - **Provider-Based Commerce Discovery:** `CatalogService` aggregates registered providers (`InternalCatalogProvider`, future merchant connectors) with normalized product schemas.
-- **Razorpay Test Mode with Transparent Mock Fallback:** Real Razorpay Test Mode API calls for Orders, Verification, and Status fetching when `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` are supplied in `.env`; deterministic mock provider for CI / offline test runs.
+- **Razorpay Test Mode with Transparent Mock Fallback:** Real Razorpay Test Mode order creation when credentials are supplied in `.env`; local HMAC signature verification and a deterministic mock provider for CI / offline runs.
 
 ## Important Files
 - `PROJECT_STATE.md`: Canonical project state.
@@ -74,11 +75,11 @@ Gemini quota-exhaustion fallback latch complete. All 29 unit tests, 10 synthetic
 - `server/database/audit_store.js`: Immutable audit trail store.
 - `server/evaluation/run_benchmarks.js`: 10-scenario synthetic benchmark suite runner.
 - `public/index.html`, `public/styles.css`, `public/app.js`: Glassmorphic web application with filtering, sorting, and product illustrations.
-- `tests/`: Complete unit and integration test suite (27 tests).
+- `tests/`: Complete unit and integration test suite (29 tests).
 
 ## Commands
 - `npm start` — Run server at `http://localhost:3000`.
-- `npm test` — Run full unit test suite (27 tests).
+- `npm test` — Run full unit test suite (29 tests).
 - `npm run eval` — Run 10-scenario synthetic benchmark suite.
 - `node tests/e2e_api_test.js` — Run live server end-to-end integration test.
 
