@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { GeminiIntentExtractor, IntentConstraintSchema } from '../server/agents/gemini_extractor.js';
+import { GeminiIntentExtractor, IntentConstraintSchema, geminiExtractor } from '../server/agents/gemini_extractor.js';
 import { buyerAgent } from '../server/agents/buyer_agent.js';
 
 test('LLM Extractor: should validate well-formed structured JSON from Gemini', () => {
@@ -99,5 +99,41 @@ test('LLM Extractor: should translate AbortError into a clean timeout message', 
     );
   } finally {
     globalThis.fetch = originalFetch;
+  }
+});
+
+test('LLM Extractor: should latch quota exhaustion and use offline fallback without another Gemini request', async () => {
+  const originalFetch = globalThis.fetch;
+  const originalApiKey = geminiExtractor.apiKey;
+  const originalQuotaExhausted = geminiExtractor.quotaExhausted;
+  let fetchCalls = 0;
+
+  geminiExtractor.apiKey = 'dummy_key_for_quota_test';
+  geminiExtractor.quotaExhausted = false;
+  globalThis.fetch = async () => {
+    fetchCalls++;
+    return {
+      ok: false,
+      status: 429,
+      text: async () => JSON.stringify({ error: { status: 'RESOURCE_EXHAUSTED' } })
+    };
+  };
+
+  try {
+    const firstResult = await buyerAgent.extractConstraints(
+      'Find me a wireless mechanical keyboard under Rs 7,500'
+    );
+    assert.equal(firstResult.constraints.extractionSource, 'deterministic_rule_engine');
+    assert.equal(geminiExtractor.isAvailable(), false);
+
+    const secondResult = await buyerAgent.extractConstraints(
+      'Find me a wireless mechanical keyboard under Rs 7,500'
+    );
+    assert.equal(secondResult.constraints.extractionSource, 'deterministic_rule_engine');
+    assert.equal(fetchCalls, 1, 'Quota latch must prevent subsequent Gemini network requests');
+  } finally {
+    globalThis.fetch = originalFetch;
+    geminiExtractor.apiKey = originalApiKey;
+    geminiExtractor.quotaExhausted = originalQuotaExhausted;
   }
 });

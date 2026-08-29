@@ -129,8 +129,8 @@ export class BuyerAgent {
       };
     }
 
-    // Try Gemini LLM if configured
-    if (geminiExtractor.isConfigured()) {
+    // Try Gemini LLM while it remains available in this server process
+    if (geminiExtractor.isAvailable()) {
       try {
         const llmConstraints = await geminiExtractor.extractIntent(sanitizedInput);
         return {
@@ -141,7 +141,11 @@ export class BuyerAgent {
           }
         };
       } catch (err) {
-        console.warn(`Gemini LLM extraction warning (${err.message}). Falling back to deterministic extractor.`);
+        if (err.message === 'Gemini quota exhausted') {
+          console.warn('Gemini quota exhausted; using offline fallback.');
+        } else {
+          console.warn(`Gemini LLM extraction warning (${err.message}). Falling back to deterministic extractor.`);
+        }
       }
     }
 

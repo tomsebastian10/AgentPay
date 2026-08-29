@@ -42,8 +42,11 @@ STAGE 24 — Product Imagery & Multi-Attribute Catalog Filtering / Sorting (Comp
   2. **Multi-Attribute Filter & Sort Controls:** Added glassmorphic toolbar allowing users to refine displayed products by Category, Price Range, Minimum Rating, Merchant Whitelist, and In-Stock Status.
   3. **Seamless Discovery Synergy:** Sorting preserves AI candidate match rankings as the default (`Recommended (AI Match)`), allowing seamless manual refinement without breaking AI proposal logic.
 
+## Latest Completed Change
+- **Gemini Quota-Exhaustion Offline Fallback Latch:** HTTP 429 / `RESOURCE_EXHAUSTED` disables Gemini for the current Node process, and subsequent intent extraction uses the deterministic engine until restart.
+
 ## Current Task
-Final features complete. All 27 unit tests, 10 synthetic benchmarks, and 7 live E2E server checks passing at 100%.
+Gemini quota-exhaustion fallback latch complete. All 29 unit tests, 10 synthetic benchmarks, and 7 live E2E server checks passing at 100%.
 
 ## Next Tasks
 1. Pitch demo recording following `docs/demo-guide.md`.
@@ -80,6 +83,6 @@ Final features complete. All 27 unit tests, 10 synthetic benchmarks, and 7 live 
 - `node tests/e2e_api_test.js` — Run live server end-to-end integration test.
 
 ## Testing Status
-- **Unit Tests:** 27 / 27 Passed (100%)
+- **Unit Tests:** 29 / 29 Passed (100%)
 - **Synthetic Benchmarks:** 10 / 10 Scenarios Passed (100%)
 - **Live E2E Server Integration:** 7 / 7 Checks Passed (100%)

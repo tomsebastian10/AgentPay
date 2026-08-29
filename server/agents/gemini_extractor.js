@@ -20,6 +20,7 @@ export class GeminiIntentExtractor {
   constructor(apiKey = config.llm.geminiApiKey) {
     this.apiKey = apiKey;
     this.modelName = 'gemini-3.6-flash';
+    this.quotaExhausted = false;
   }
 
   /**
@@ -27,6 +28,14 @@ export class GeminiIntentExtractor {
    */
   isConfigured() {
     return Boolean(this.apiKey && this.apiKey.trim().length > 0 && !this.apiKey.includes('placeholder'));
+  }
+
+  /**
+   * Check whether Gemini can be called in this server process.
+   * A restart creates a new extractor and resets the quota latch.
+   */
+  isAvailable() {
+    return this.isConfigured() && !this.quotaExhausted;
   }
 
   /**
@@ -73,6 +82,10 @@ export class GeminiIntentExtractor {
       throw new Error('GEMINI_API_KEY is not configured');
     }
 
+    if (this.quotaExhausted) {
+      throw new Error('Gemini quota exhausted');
+    }
+
     const systemInstruction = SYSTEM_PROMPTS.intentExtraction;
     const prompt = `Classify intent and extract shopping constraints for the following user request:
 <USER_REQUEST>
@@ -109,7 +122,11 @@ ${sanitizedQuery}
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Gemini API error (status ${response.status}): ${errorText}`);
+        if (response.status === 429 || errorText.includes('RESOURCE_EXHAUSTED')) {
+          this.quotaExhausted = true;
+          throw new Error('Gemini quota exhausted');
+        }
+        throw new Error(`Gemini API error (status ${response.status})`);
       }
 
       const responseData = await response.json();

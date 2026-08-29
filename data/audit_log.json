@@ -1,5 +1,203 @@
 [
   {
+    "id": "audit_7ca3f75a-3fea-4b94-8690-c8d9a7f4b2c1",
+    "timestamp": "2026-08-29T04:15:02.251Z",
+    "intentId": "intent_9f4a7e46-d3d9-4d94-bb1d-e337850b792e",
+    "eventType": "PAYMENT_VERIFIED",
+    "status": "SUCCESS",
+    "details": {
+      "orderId": "order_mock_8263825ee19fefb7",
+      "paymentId": "pay_mock_d9ecbeb93e0212bb",
+      "isValid": true,
+      "error": null,
+      "gatewayMode": "mock"
+    }
+  },
+  {
+    "id": "audit_4b60c8d9-acf3-43ab-ae1f-9ff2b1373d4e",
+    "timestamp": "2026-08-29T04:15:02.237Z",
+    "intentId": "intent_9f4a7e46-d3d9-4d94-bb1d-e337850b792e",
+    "eventType": "PAYMENT_ATTEMPT",
+    "status": "SUCCESS",
+    "details": {
+      "orderId": "order_mock_8263825ee19fefb7",
+      "paymentId": "pay_mock_d9ecbeb93e0212bb",
+      "status": "captured",
+      "error": null
+    }
+  },
+  {
+    "id": "audit_687fae62-fffb-48b8-8008-6bd6af525412",
+    "timestamp": "2026-08-29T04:15:02.216Z",
+    "intentId": "intent_9f4a7e46-d3d9-4d94-bb1d-e337850b792e",
+    "eventType": "ORDER_CREATED",
+    "status": "SUCCESS",
+    "details": {
+      "orderId": "order_mock_8263825ee19fefb7",
+      "amountPaise": 2999000,
+      "currency": "INR",
+      "isSimulated": true,
+      "gatewayMode": "mock"
+    }
+  },
+  {
+    "id": "audit_2d004e8b-8251-4046-9310-a2e45b055c0e",
+    "timestamp": "2026-08-29T04:15:02.205Z",
+    "intentId": "intent_9f4a7e46-d3d9-4d94-bb1d-e337850b792e",
+    "eventType": "POLICY_EVALUATION",
+    "status": "SUCCESS",
+    "details": {
+      "allowed": true,
+      "violations": [],
+      "evaluatedProduct": "prod_sony_wh1000xm5",
+      "evaluatedMerchant": "sonyindia",
+      "authorizedAmountINR": 29990,
+      "livePriceINR": 29990,
+      "nonce": "nonce_b1fd02ddc255b8281e1589bc27c1380e"
+    }
+  },
+  {
+    "id": "audit_6bd29e88-c0b3-4ecb-a390-376d86e9dfd8",
+    "timestamp": "2026-08-29T04:15:02.173Z",
+    "intentId": "intent_9f4a7e46-d3d9-4d94-bb1d-e337850b792e",
+    "eventType": "AUTHORIZATION_GRANTED",
+    "status": "SUCCESS",
+    "details": {
+      "tokenId": "sat_54c20551-9262-4ca1-9d74-6d02bbf1c62f",
+      "productId": "prod_sony_wh1000xm5",
+      "merchantId": "sonyindia",
+      "authorizedAmountINR": 29990,
+      "nonce": "nonce_b1fd02ddc255b8281e1589bc27c1380e",
+      "expiresAt": "2026-08-29T04:20:02.168Z"
+    }
+  },
+  {
+    "id": "audit_966d3eeb-8af9-4275-8edc-cd05115e1caf",
+    "timestamp": "2026-08-29T04:15:00.280Z",
+    "intentId": "intent_9f4a7e46-d3d9-4d94-bb1d-e337850b792e",
+    "eventType": "PROPOSAL_GENERATED",
+    "status": "SUCCESS",
+    "details": {
+      "intentId": "intent_9f4a7e46-d3d9-4d94-bb1d-e337850b792e",
+      "quoteId": "quote_56b98a88-4a55-4a66-ab5d-23227f3225a5",
+      "productId": "prod_sony_wh1000xm5",
+      "merchantId": "sonyindia",
+      "merchantName": "Sony India Official",
+      "productTitle": "Sony WH-1000XM5 Wireless ANC Headphones",
+      "priceINR": 29990,
+      "pricePaise": 2999000,
+      "currency": "INR",
+      "userBudgetINR": 29990,
+      "reasoning": "User selected \"Sony WH-1000XM5 Wireless ANC Headphones\" by Sony India Official. Backed by verified merchant with 97% trust rating and 4.8★ user rating.",
+      "scoreBreakdown": {
+        "featureScore": 100,
+        "ratingScore": 96,
+        "merchantTrustScore": 97,
+        "budgetScore": 100,
+        "inStock": true
+      },
+      "validUntil": "2026-08-29T04:20:00.280Z",
+      "specs": {
+        "type": "Over-Ear (Closed Back)",
+        "driversSize": "30mm Carbon Fibre Composite",
+        "frequencyResponse": "4Hz – 40,000Hz",
+        "noiseCancellation": "Industry-Leading 8-mic ANC with Adaptive Sound Control",
+        "connectivity": "Bluetooth 5.2 (LDAC, AAC, SBC) + 3.5mm Jack",
+        "battery": "30 hours ANC-on (60h total), 3-min Quick Charge = 3h",
+        "foldable": false,
+        "weight": "250g"
+      },
+      "imageUrl": "/images/products/headphones.svg"
+    }
+  },
+  {
+    "id": "audit_2144a1f7-94d3-4126-8553-c5d563f895ab",
+    "timestamp": "2026-08-29T04:13:35.155Z",
+    "intentId": "intent_49215582-a6a0-429f-9818-1892a32e3dd5",
+    "eventType": "PROPOSAL_GENERATED",
+    "status": "SUCCESS",
+    "details": {
+      "intentId": "intent_49215582-a6a0-429f-9818-1892a32e3dd5",
+      "quoteId": "quote_59602484-88fd-4245-baf2-47e641a85204",
+      "productId": "prod_dell_xps15",
+      "merchantId": "dell_india",
+      "merchantName": "Dell India Official",
+      "productTitle": "Dell XPS 15 9530 Laptop – Core i7 / 16GB / 512GB / RTX 4060",
+      "priceINR": 179990,
+      "pricePaise": 17999000,
+      "currency": "INR",
+      "userBudgetINR": 179990,
+      "reasoning": "Selected \"Dell XPS 15 9530 Laptop – Core i7 / 16GB / 512GB / RTX 4060\" from Dell India Official at ₹1,79,990 as the top overall match for your requirements. It features smooth switches, compact layout, a 4.7★ rating (1020 reviews), and 96% merchant trust score.",
+      "scoreBreakdown": {
+        "featureScore": 100,
+        "ratingScore": 94,
+        "merchantTrustScore": 96,
+        "budgetScore": 75,
+        "inStock": true
+      },
+      "validUntil": "2026-08-29T04:18:35.114Z",
+      "specs": {
+        "processor": "Intel Core i7-13700H (16-core up to 5.0GHz)",
+        "memory": "16GB DDR5 (Upgradeable to 64GB)",
+        "storage": "512GB PCIe Gen 4 NVMe SSD",
+        "display": "15.6\" FHD+ OLED (3456x2160) Touch, 400 nits",
+        "graphics": "NVIDIA GeForce RTX 4060 8GB GDDR6",
+        "battery": "86Whr (Up to 8 hours, 130W USB-C charge)",
+        "connectivity": "2x Thunderbolt 4, 1x USB-A, 1x HDMI 2.1, SD Reader",
+        "os": "Windows 11 Home",
+        "weight": "1.86kg"
+      },
+      "imageUrl": "/images/products/laptop.svg"
+    }
+  },
+  {
+    "id": "audit_d9cf24a2-545c-4df8-a0c0-d1623b248e6e",
+    "timestamp": "2026-08-29T04:13:35.099Z",
+    "intentId": "intent_49215582-a6a0-429f-9818-1892a32e3dd5",
+    "eventType": "DISCOVERY_COMPLETED",
+    "status": "SUCCESS",
+    "details": {
+      "totalFound": 4,
+      "candidateIds": [
+        "prod_dell_xps13",
+        "prod_dell_xps15",
+        "prod_samsung_galaxy_book3_pro",
+        "prod_sony_vaio_fe"
+      ]
+    }
+  },
+  {
+    "id": "audit_e7dc7564-4356-46e1-8cf5-1c2e61db6855",
+    "timestamp": "2026-08-29T04:13:35.085Z",
+    "intentId": "intent_49215582-a6a0-429f-9818-1892a32e3dd5",
+    "eventType": "INTENT_EXTRACTED",
+    "status": "SUCCESS",
+    "details": {
+      "intentType": "commerce",
+      "conversationalReply": null,
+      "clarificationPrompt": null,
+      "category": "laptop",
+      "maxBudgetINR": null,
+      "budgetSpecified": false,
+      "currency": "INR",
+      "requiredFeatures": [],
+      "originalQuery": "laptops",
+      "extractionSource": "deterministic_rule_engine"
+    }
+  },
+  {
+    "id": "audit_37d5e01a-742c-4714-84bb-9402036815e9",
+    "timestamp": "2026-08-29T04:13:26.112Z",
+    "intentId": "intent_5ab22b41-486d-42e7-864f-441f0f63ab0c",
+    "eventType": "CONVERSATIONAL_INTENT",
+    "status": "SUCCESS",
+    "details": {
+      "query": "hi",
+      "reply": "Hello! I am AgentPay, your e-commerce shopping assistant. I can help you find products like keyboards, mice, monitors, headphones, laptops, and webcams based on your budget and preferences. How can I help you today?",
+      "source": "gemini_llm"
+    }
+  },
+  {
     "id": "audit_910779e6-69e7-43ab-9ae2-e374b9fbbe24",
     "timestamp": "2026-08-28T17:52:09.673Z",
     "intentId": "intent_86db051d-cfd7-408e-a16e-319940ab3f6f",
