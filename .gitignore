@@ -27,3 +27,6 @@ coverage/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Runtime-generated audit trail
+data/audit_log.json

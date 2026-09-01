@@ -105,13 +105,17 @@ router.post('/agent/authorize', (req, res) => {
       return res.status(400).json({ error: 'Missing required authorization parameters' });
     }
 
+    const userLimit = userProfile.maxSingleTxnLimitINR;
+    const requestedBudget = maxBudgetINR || priceINR;
+    const effectiveBudgetINR = Math.min(requestedBudget, userLimit);
+
     const token = SpendTokenManager.issueToken({
       intentId,
       productId,
       merchantId,
       priceINR,
       pricePaise: pricePaise || Math.round(priceINR * 100),
-      maxBudgetINR: maxBudgetINR || priceINR
+      maxBudgetINR: effectiveBudgetINR
     });
 
     auditStore.logEvent({
