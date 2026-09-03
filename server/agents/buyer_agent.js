@@ -42,7 +42,6 @@ export class BuyerAgent {
     else if (/webcam|camera/i.test(sanitizedInput)) category = 'webcam';
 
     // 3. Extract budget in INR if explicitly specified by user
-    // CRITICAL: If no budget is specified, keep maxBudgetINR as null (do NOT impose artificial default)
     let maxBudgetINR = null;
     let budgetSpecified = false;
     const budgetMatch = sanitizedInput.match(/(?:under|below|max|budget|within|<=?|around|max\s*of|upto|up\s*to|₹|\brs\.?)\s*₹?\s*([\d,]+(?:\.\d+)?)\s*(k|lakh)?/i) ||
@@ -116,7 +115,7 @@ export class BuyerAgent {
    * Leverages Google Gemini free tier with structured JSON output,
    * with automatic fallback to deterministic rule engine.
    */
-  async extractConstraints(userInput) {
+  async extractConstraints(userInput, options={}) {
     const sanitizedInput = InputSanitizer.sanitizeString(userInput);
     const injectionCheck = InputSanitizer.inspectForInjection(userInput);
 
@@ -130,7 +129,7 @@ export class BuyerAgent {
     }
 
     // Try Gemini LLM while it remains available in this server process
-    if (geminiExtractor.isAvailable()) {
+    if (!options.forceDeterministic && geminiExtractor.isAvailable()) {
       try {
         const llmConstraints = await geminiExtractor.extractIntent(sanitizedInput);
         return {
@@ -241,11 +240,11 @@ export class BuyerAgent {
   /**
    * Main shopping workflow: Process Query -> Extract Constraints -> Discover -> Score -> Generate Proposal
    */
-  async processShoppingIntent(userInput) {
+  async processShoppingIntent(userInput, options={}) {
     const intentId = `intent_${crypto.randomUUID()}`;
 
     // Step 1: Constraint Extraction & Adversarial Inspection
-    const extractionResult = await this.extractConstraints(userInput);
+    const extractionResult = await this.extractConstraints(userInput,options);
     
     if (extractionResult.isMalicious) {
       auditStore.logEvent({
