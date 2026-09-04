@@ -15,7 +15,7 @@ As commerce transitions from human browser clicks to autonomous AI agents, finan
 
 **AgentPay** solves this through a **Dual-Engine Architecture**:
 1. **Buyer Agent:** Uses optional Gemini or a deterministic offline engine for natural-language intent classification and structured constraint extraction. Product discovery, candidate scoring, and explanations are deterministic.
-2. **Deterministic Policy Gatekeeper:** A zero-trust layer enforcing strict mathematical budget limits, real-time price invariance, merchant whitelist verification, cryptographic AP2 token signatures, and anti-replay nonces with **zero LLM involvement in financial decisions**.
+2. **Deterministic Policy Gatekeeper:** A zero-trust layer enforcing strict mathematical budget limits, real-time price invariance, merchant whitelist verification, AP2-inspired cryptographic spend tokens, and anti-replay nonces with **zero LLM involvement in financial decisions**.
 
 ---
 
@@ -37,13 +37,13 @@ User's Natural-Language Request
 (3) Deterministic Multi-Attribute Scoring & Comparison Matrix (Feature Match, Rating, Merchant Trust, Price)
               │
               ▼
-(4) Bounded Purchase Proposal & Human Explanation (x402 Protocol Quote with TTL)
+(4) Bounded Purchase Proposal & Human Explanation (TTL-based Quote)
               │
               ▼
 (5) Explicit Human Authorization via Dashboard
               │
               ▼
-(6) AP2 Spend Authorization Token Issued (HMAC-SHA256 bound to intent, product, merchant, price, nonce)
+(6) AP2-Inspired Spend Authorization Token Issued (HMAC-SHA256 bound to intent, product, merchant, price, nonce)
               │
               ▼
 (7) Zero-Trust Deterministic Policy Verification
@@ -57,7 +57,7 @@ User's Natural-Language Request
                       Constant-Time HMAC-SHA256 Signature Verification (`crypto.timingSafeEqual`)
                             │
                             ▼
-                      Immutable Append-Only Audit Ledger Receipt
+                      Append-Only Audit Trail Receipt
 ```
 
 ---
